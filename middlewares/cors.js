@@ -1,12 +1,10 @@
 const allowedCors = [
-  'https://vse-na-meste.nomoredomains.xyz',
-  'http://vse-na-meste.nomoredomains.xyz',
+
   'https://api.movies.nomoredomains.sbs.nomoredomains.sbs',
   'http://api.movies.nomoredomains.sbs.nomoredomains.sbs',
   'http://localhost:3000',
   'localhost:3000',
   'https://localhost:3001',
-  'vse-na-meste.nomoredomains.xyz',
 ];
 
 module.exports = ((req, res, next) => {
