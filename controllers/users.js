@@ -61,7 +61,11 @@ module.exports.updateUser = (req, res, next) => {
   )
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.code === MONGO_DUPLICATE_ERROR_CODE) {
+        next(new ConflictError('Такой пользователь уже существует'));
+        return;
+      }
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
       } else {
         next(err);
@@ -83,6 +87,9 @@ module.exports.login = (req, res, next) => {
         bcrypt.compare(password, user.password),
       ]);
     })
+    .catch((err) => {
+      next(err);
+    })
     .then(([user, isPasswordCorrect]) => {
       if (!isPasswordCorrect) {
         next(new UnauthorizedError('Неправильный емейл или пароль'));
@@ -96,5 +103,8 @@ module.exports.login = (req, res, next) => {
       res.send({
         token,
       });
+    })
+    .catch((err) => {
+      next(err);
     });
 };

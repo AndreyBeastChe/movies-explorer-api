@@ -12,6 +12,9 @@ const NotFoundError = require('./errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const cors = require('./middlewares/cors');
 
+const DEV_URL = 'mongodb://localhost:27017/moviesdb';
+const { NODE_ENV, PROD_MONGO_URL } = process.env;
+
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -22,7 +25,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // подключаемся к серверу mongo
-mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
+mongoose.connect(NODE_ENV === 'production' ? PROD_MONGO_URL : DEV_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -32,15 +35,15 @@ app.use(cors);
 const validate = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-    name: Joi.string().min(2).max(30),
+    password: Joi.string().required(),
+    name: Joi.string().required().min(2).max(30),
   }),
 });
 
 const validateLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
   }),
 });
 
@@ -56,7 +59,7 @@ app.post('/signup', validate, createUser);
 app.use('/users', auth, usersRouter);
 app.use('/movies', auth, moviesRouter);
 
-app.use('*', (req, res, next) => {
+app.use('*', auth, (req, res, next) => {
   next(new NotFoundError('Несуществующий адрес'));
 });
 

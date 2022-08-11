@@ -66,9 +66,12 @@ module.exports.deleteMovieById = (req, res, next) => {
         next(new ForbiddenError('Можно удалять только свой фильм'));
         return;
       }
-      Movie.remove().then(() => {
+      Movie.findByIdAndDelete(id).then(() => {
         res.status(200).send({ message: 'Фильм успешно удален' });
-      });
+      })
+        .catch((err) => {
+          next(err);
+        });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
