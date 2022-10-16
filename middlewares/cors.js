@@ -5,6 +5,9 @@ const allowedCors = [
   'http://localhost:3000',
   'localhost:3000',
   'https://localhost:3001',
+  'https://movies.nomoredomains.sbs',
+  'http://movies.nomoredomains.sbs',
+  'movies.nomoredomains.sbs',
 ];
 
 module.exports = ((req, res, next) => {
